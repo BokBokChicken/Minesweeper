@@ -1,13 +1,12 @@
-
-
 import de.bezier.guido.*;
 //Declare and initialize NUM_ROWS and NUM_COLS = 20
 private MSButton[][] buttons; //2d array of minesweeper buttons
-private ArrayList <MSButton> bombs; //ArrayList of just the minesweeper buttons that are mined
-
+private ArrayList <MSButton> bombs = new ArrayList <MSButton>(); //ArrayList of just the minesweeper buttons that are mined
+public final static int NUM_ROWS = 30;
+public final static int NUM_COLS = 16;
 void setup ()
 {
-    size(400, 400);
+    size(320, 600);
     textAlign(CENTER,CENTER);
     
     // make the manager
@@ -16,11 +15,27 @@ void setup ()
     
 
     //declare and initialize buttons
+    buttons = new MSButton [NUM_ROWS][NUM_COLS];
+    for(int rows = 0; rows < NUM_ROWS; rows++)
+    {   
+        for(int cols = 0; cols < NUM_COLS; cols++)
+        {
+            buttons[rows][cols] = new MSButton(rows, cols);
+        }
+    }
     setBombs();
 }
 public void setBombs()
 {
-    //your code
+    for(int b = 0; b < 100; b++)
+    {
+        int row = (int)(Math.random()*30);
+        int col = (int)(Math.random()*16);
+        if(bombs.contains(buttons[row][col]) == false)
+        {
+            bombs.add(buttons[row][col]);
+        }
+    }
 }
 
 public void draw ()
@@ -31,16 +46,25 @@ public void draw ()
 }
 public boolean isWon()
 {
-    //your code here
-    return false;
+    for(int rows = 0; rows < 20; rows++)
+    {   
+        for(int cols = 0; cols < 20; cols++)
+        {
+            if(buttons[rows][cols].isClicked() != true)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 public void displayLosingMessage()
 {
-    //your code here
+
 }
 public void displayWinningMessage()
 {
-    //your code here
+
 }
 
 public class MSButton
@@ -52,8 +76,8 @@ public class MSButton
     
     public MSButton ( int rr, int cc )
     {
-        // width = 400/NUM_COLS;
-        // height = 400/NUM_ROWS;
+        width = 320/NUM_COLS;
+        height = 600/NUM_ROWS;
         r = rr;
         c = cc; 
         x = c*width;
@@ -75,15 +99,40 @@ public class MSButton
     public void mousePressed () 
     {
         clicked = true;
-        //your code here
+        if(keyPressed  == true)
+        {
+            marked = !marked;
+        }
+        else if(bombs.contains(this))
+        {
+            displayLosingMessage();
+        }
+        else if(countBombs(r,c) > 0)
+        {
+            println(countBombs(r,c));
+            setLabel("" + countBombs(r,c));
+        }
+        else
+        {
+            for(int ro = r - 1; ro <= r + 1; ro++)
+            {
+                for(int co = c - 1; co <= c + 1; co++)
+                {
+                    if(isValid(ro,co) == true && buttons[ro][co].isClicked() == false && buttons[ro][co].isMarked() == false)
+                    {
+                        buttons[ro][co].mousePressed();
+                    }
+                }
+            }
+        }
     }
 
     public void draw () 
     {    
         if (marked)
             fill(0);
-        // else if( clicked && bombs.contains(this) ) 
-        //     fill(255,0,0);
+        else if( clicked && bombs.contains(this) ) 
+            fill(255,0,0);
         else if(clicked)
             fill( 200 );
         else 
@@ -99,13 +148,34 @@ public class MSButton
     }
     public boolean isValid(int r, int c)
     {
-        //your code here
-        return false;
+        if((r < 0 || r > NUM_ROWS - 1) || (c < 0 || c > NUM_COLS - 1))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
     public int countBombs(int row, int col)
     {
         int numBombs = 0;
-        //your code here
+        for(int ro = row - 1; ro <= row + 1; ro++)
+        {
+
+            for(int co = col - 1; co <= col + 1; co++)
+            {
+
+                if(isValid(ro, co) == true)
+                {
+
+                    if(bombs.contains(buttons[ro][co]) == true)
+                    {
+                        numBombs++;
+                    }
+                }
+            }
+        }
         return numBombs;
     }
 }
