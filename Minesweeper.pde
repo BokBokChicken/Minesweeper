@@ -3,10 +3,10 @@ import de.bezier.guido.*;
 private MSButton[][] buttons; //2d array of minesweeper buttons
 private ArrayList <MSButton> bombs = new ArrayList <MSButton>(); //ArrayList of just the minesweeper buttons that are mined
 public final static int NUM_ROWS = 30;
-public final static int NUM_COLS = 16;
+public final static int NUM_COLS = 30;
 void setup ()
 {
-    size(320, 600);
+    size(600, 700);
     textAlign(CENTER,CENTER);
     
     // make the manager
@@ -30,7 +30,7 @@ public void setBombs()
     for(int b = 0; b < 100; b++)
     {
         int row = (int)(Math.random()*30);
-        int col = (int)(Math.random()*16);
+        int col = (int)(Math.random()*30);
         if(bombs.contains(buttons[row][col]) == false)
         {
             bombs.add(buttons[row][col]);
@@ -46,9 +46,9 @@ public void draw ()
 }
 public boolean isWon()
 {
-    for(int rows = 0; rows < 20; rows++)
+    for(int rows = 0; rows < NUM_ROWS; rows++)
     {   
-        for(int cols = 0; cols < 20; cols++)
+        for(int cols = 0; cols < NUM_COLS; cols++)
         {
             if(buttons[rows][cols].isClicked() != true)
             {
@@ -60,11 +60,28 @@ public boolean isWon()
 }
 public void displayLosingMessage()
 {
-
+   stroke(10);
+   fill(255);
+   for(int i = 0; i < NUM_COLS; i++)
+   {
+       for(int j = 0; j < NUM_ROWS; j++)
+       {
+           if(bombs.contains(buttons[i][j]))
+           {
+               buttons[i][j].clicked = true;
+               buttons[i][j].draw();
+           }
+       }
+   }
+   text("You Lose", 300, 650);
+   noLoop();  
 }
 public void displayWinningMessage()
 {
-
+   fill(0);
+   stroke(10);
+   text("You Win", 300, 650);
+   noLoop();
 }
 
 public class MSButton
@@ -76,7 +93,7 @@ public class MSButton
     
     public MSButton ( int rr, int cc )
     {
-        width = 320/NUM_COLS;
+        width = 600/NUM_COLS;
         height = 600/NUM_ROWS;
         r = rr;
         c = cc; 
@@ -99,7 +116,7 @@ public class MSButton
     public void mousePressed () 
     {
         clicked = true;
-        if(keyPressed  == true)
+        if(mouseButton == RIGHT)
         {
             marked = !marked;
         }
@@ -109,7 +126,6 @@ public class MSButton
         }
         else if(countBombs(r,c) > 0)
         {
-            println(countBombs(r,c));
             setLabel("" + countBombs(r,c));
         }
         else
@@ -179,6 +195,3 @@ public class MSButton
         return numBombs;
     }
 }
-
-
-
